@@ -1,21 +1,17 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState } from 'react'
 import Swal from 'sweetalert2';
 
-function Add({ employees, setEmployees, setIsAdding }) {
+function Edit({ employees, selectedEmployee, setEmployees, setIsEditing }) {
 
-    const [Name, setName] = useState('');
-    const [role, setRole] = useState('');
-    const [email, setEmail] = useState('');
-    const [date, setDate] = useState('');
+    const id = selectedEmployee.id;
 
-    const textInput = useRef(null);
+    const [Name, setName] = useState(selectedEmployee.Name);
+    const [role, setRole] = useState(selectedEmployee.role);
+    const [email, setEmail] = useState(selectedEmployee.email);
 
-    useEffect(() => {
-        textInput.current.focus();
-    }, [])
-
-    const handleAdd = e => {
+    const handleUpdate = e => {
         e.preventDefault();
+
         if (!Name || !role || !email ) {
             return Swal.fire({
                 icon: 'error',
@@ -25,37 +21,40 @@ function Add({ employees, setEmployees, setIsAdding }) {
             });
         }
 
-        const id = employees.length + 1;
-        const newEmployee = {
+        const employee = {
             id,
             Name,
             role,
             email
-            
+        };
+
+        for (let i = 0; i < employees.length; i++) {
+            if (employees[i].id === id) {
+                employees.splice(i, 1, employee);
+                break;
+            }
         }
-        employees.push(newEmployee);
+
         setEmployees(employees);
-        setIsAdding(false);
+        setIsEditing(false);
 
         Swal.fire({
             icon: 'success',
-            title: 'Added!',
-            text: `${Name} ${role}'s data has been Added.`,
+            title: 'Updated!',
+            text: `${employee.Name} ${employee.role}'s data has been updated.`,
             showConfirmButton: false,
             timer: 1500
         });
-    }
-
+    };
 
     return (
         <div className="small-container">
-            <form onSubmit={handleAdd}>
-                <h1>Add Employee</h1>
-                <label htmlFor="Name"> Name</label>
+            <form onSubmit={handleUpdate}>
+                <h1>Edit Employee</h1>
+                <label htmlFor="Name">First Name</label>
                 <input
                     id="Name"
                     type="text"
-                    ref={textInput}
                     name="Name"
                     value={Name}
                     onChange={e => setName(e.target.value)}
@@ -77,13 +76,13 @@ function Add({ employees, setEmployees, setIsAdding }) {
                     onChange={e => setEmail(e.target.value)}
                 />
                 <div style={{ marginTop: '30px' }}>
-                    <input type="submit" value="Add" />
+                    <input type="submit" value="Update" />
                     <input
                         style={{ marginLeft: '12px' }}
                         className="muted-button"
                         type="button"
                         value="Cancel"
-                        onClick={() => setIsAdding(false)}
+                        onClick={() => setIsEditing(false)}
                     />
                 </div>
             </form>
@@ -91,4 +90,4 @@ function Add({ employees, setEmployees, setIsAdding }) {
     );
 }
 
-export default Add
+export default Edit
